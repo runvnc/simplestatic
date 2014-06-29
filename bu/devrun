@@ -8,7 +8,7 @@ save_data() {
   local file="$3"
   touch $file
   grep -q "^$key=" $file && sed "s/^$key=.*/$key=$val/" -i $file || 
-      sed "$ a\$key=$val" -i $file
+          echo "$key=$val" >>$file
 }
 
 load_data() {
@@ -47,6 +47,7 @@ git stash
 
 trap 'on_done' TERM
 
+git init .
 git remote remove oicdev
 git remote add oicdev ssh://root@$server:7164/build/$image/
 git checkout -b oicdev1

@@ -7,8 +7,8 @@ save_data() {
   local val="$2"
   local file="$3"
   touch $file
-  #grep -q "^$key=" $file && sed "s/^$key=.*/$key=$val/" -i $file || 
-  sed "$ a\$key=$val" -i $file
+  grep -q "^$key=" $file && sed "s/^$key=.*/$key=$val/" -i $file || 
+          echo "$key=$val" >>$file
 }
 
 load_data() {
@@ -43,7 +43,7 @@ on_done() {
   git stash apply
 }
 
-git stash
+git stash && git stash apply
 
 trap 'on_done' TERM
 
