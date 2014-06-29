@@ -53,7 +53,7 @@ git remote add oicdev ssh://root@$server:7164/build/$image/
 git checkout -b oicdev1
 git add --all
 git commit -m "oic dev"
-git push -v oicdev oicdev1
+git push --force -v oicdev oicdev1
 remotecmd $server oic config apikey $apikey
 remotecmd $server oic config account $account
 remotecmd $server dockbuild $server $image $domain
