@@ -53,6 +53,7 @@ git remote add oicdev ssh://root@$server:7164/build/$image/
 git checkout -b oicdev1
 git add --all
 git commit -m "oic dev"
+cat Dockerfile
 git push oicdev oicdev1
 remotecmd $server oic config apikey $apikey
 remotecmd $server oic config account $account
