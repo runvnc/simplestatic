@@ -1,0 +1,62 @@
+#!/bin/bash
+
+source $HOME/.oicrc
+
+save_data() {
+  local key="$1"
+  local val="$2"
+  local file="$3"
+  touch $file
+  #grep -q "^$key=" $file && sed "s/^$key=.*/$key=$val/" -i $file || 
+  sed "$ a\$key=$val" -i $file
+}
+
+load_data() {
+  local file="$1"
+  . $file
+  echo "Loaded parameters from $file"
+}
+
+if [ "$#" -ne 3 ]; then
+  if [ -e devrun.params ]; then
+    load_data devrun.params
+  else
+    echo "No devrun.params to load params from."
+    echo "Usage is devrun <server> <image> <domain>"
+    exit 1
+  fi
+else
+  server=$1
+  image=$2
+  domain=$3
+  echo "Command line parameters are server=$server and image=$image and domain=$domain"
+fi
+
+. ./remotelib
+
+save_data server $server devrun.params
+save_data image $image devrun.params
+save_data domain $domain devrun.params
+echo "Saved params."
+
+on_done() {
+  git stash apply
+}
+
+git stash
+
+trap 'on_done' TERM
+
+git init .
+git remote remove oicdev
+git remote add oicdev ssh://root@$server:7164/build/$image/
+git checkout -b oicdev1
+git add --all
+git commit -m "oic dev"
+git push -v oicdev oicdev1
+remotecmd $server oic config apikey $apikey
+remotecmd $server oic config account $account
+remotecmd $server dockbuild $server $image $domain
+
+on_done
+

@@ -1,0 +1,28 @@
+#!/bin/bash
+AGENT_INFO=$HOME/.agent_info; export AGENT_INFO
+
+# Source Environment for SSH Agent
+. $AGENT_INFO >/dev/null
+
+remotecmd() {
+  host=$1
+  shift
+  ssh -2 -t -p 7164 -o UserKnownHostsFile=/dev/null \
+      -o ConnectTimeout=10 -o StrictHostKeyChecking=no \
+      -o TCPKeepAlive=yes \
+      -o ServerAliveInterval=60 \
+      -o ServerAliveCountMax=20 \
+      -o ControlPath=~/.ssh/master-%r@%h:%p \
+      -o ControlMaster=auto \
+      -o ControlPersist=1h \
+      root@$host "$@"
+}
+
+cpremote() {
+  local host=$1
+  shift
+
+  scp -P 7164 -o 'UserKnownHostsFile /dev/null' -o 'StrictHostKeyChecking no' $1 root@$host:$2
+}
+
+
