@@ -3,7 +3,6 @@ server {
 
   root /var/www;
 
-  # Make site accessible from http://localhost/
   server_name localhost;
 
   location / {
